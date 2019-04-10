@@ -1,7 +1,7 @@
 # import Flask Script object
 from flask_script import Manager, Server
 from flask_migrate import MigrateCommand
-from APP import app, db
+from App import app, db
 # Init manager object via app object
 manager = Manager(app)
 
