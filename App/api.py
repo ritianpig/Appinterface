@@ -212,7 +212,10 @@ def index():
                 res_data = Article.query.filter_by(appid=appid,
                                                    column_id=column_id).all()
                 if res_data:
-                    randomdata_list = random.sample(res_data, 8)
+                    try:
+                        randomdata_list = random.sample(res_data, 8)
+                    except:
+                        randomdata_list = res_data
                     result = getresult(user_id, randomdata_list)
                     return jsonify(result)
                 else:
@@ -223,11 +226,11 @@ def index():
                                                    column_id=column_id,
                                                    class_id=class_id).all()
                 if res_data:
-                    index1 = data_dic["page"] * 8
-                    index2 = (data_dic["page"] + 1) * 8
-                    descdata_list = res_data[index1:index2]
-
-                    result = getresult(user_id, descdata_list)
+                    try:
+                        randomdata_list = random.sample(res_data, 8)
+                    except:
+                        randomdata_list = res_data
+                    result = getresult(user_id, randomdata_list)
                     return jsonify(result)
                 else:
                     return "class%s没有数据" % class_id
