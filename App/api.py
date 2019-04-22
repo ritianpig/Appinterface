@@ -7,7 +7,7 @@ import string
 from flask import request, jsonify
 from . import app, db
 from models import Article, Pictures, User, Collect, History, Up, Hotkey, \
-    ColumnClass
+    ColumnClass, Material
 
 
 def getresult(user_id, datalist):
@@ -21,6 +21,18 @@ def getresult(user_id, datalist):
             user_id=user_id, article_id=data.article_id).first()
         res_article = Article.query.filter_by(article_id=data.article_id)\
             .first()
+        res_material = Material.query.filter_by(article_id=data.article_id)\
+            .first()
+        x = ""
+        if res_material:
+            material = json.loads(res_material.material)
+            amount = json.loads(res_material.amount)
+            material_dic = dict(zip(material, amount))
+            for k, v in material_dic.items():
+                x += k + ":" + v + ","
+            x = x[:-1]
+        else:
+            pass
 
         if res_collect:
             iscollect = "1"
@@ -42,6 +54,7 @@ def getresult(user_id, datalist):
             'article_name': res_article.article_name,
             'class_id': res_article.class_id,
             'column_id': res_article.column_id,
+            "material": x,
             'content': res_article.content,
             'countcollect': res_article.countcollect,
             'countbrowse': res_article.countbrowse,
@@ -93,6 +106,7 @@ def index():
         cleanup = request.headers.get("cleanup")
         cancelup = request.headers.get("cancelup")
         isarticle = request.headers.get("isarticle")
+        recordcouunt = request.headers.get("recordcount")
 
         # 用户注册
         if register:
@@ -456,6 +470,19 @@ def index():
                 return jsonify(result)
             else:
                 return jsonify([])
+
+        if recordcouunt:
+            data_dic = json.loads(get_data)
+            user_id = data_dic["user_id"]
+            res_historys = History.query.filter_by(user_id=user_id).all()
+            res_collects = Collect.query.filter_by(user_id=user_id).all()
+            res_ups = Up.query.filter_by(user_id=user_id).all()
+            result = {
+                "HiCount": len(res_historys),
+                "CoCount": len(res_collects),
+                "UpCount": len(res_ups)
+            }
+            return jsonify(result)
 
     else:
         return "不支持GET请求"
