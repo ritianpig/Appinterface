@@ -254,21 +254,32 @@ def index():
             user_id = data_dic["user_id"]
             article_id = data_dic["article_id"]
             only_article = Article.query.filter_by(article_id=article_id).all()
+            if only_article:
+                result = getresult(user_id, only_article)
+                return jsonify(result)
+            else:
+                return "没有该文章id"
 
         # 用户收藏逻辑
         if iscollect:
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
             article_id = data_dic["article_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
+
             res_collect = Collect.query.filter_by(user_id=user_id,
-                                                  article_id=article_id).first()
+                                                  article_id=article_id,
+                                                  appid=appid,
+                                                  order=order).first()
             if res_collect:
                 return "文章已经被用户收藏过了"
             else:
                 res_article = Article.query.filter_by(
                     article_id=article_id).first()
                 res_article.countcollect += 1
-                add_collect = Collect(user_id=user_id, article_id=article_id)
+                add_collect = Collect(user_id=user_id, article_id=article_id,
+                                      appid=appid, order=order)
                 db.session.add(add_collect)
                 db.session.commit()
                 return "ok"
@@ -278,8 +289,12 @@ def index():
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
             article_id = data_dic["article_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
             res_history = History.query.filter_by(user_id=user_id,
-                                                  article_id=article_id).first()
+                                                  article_id=article_id,
+                                                  appid=appid,
+                                                  order=order).first()
             res_article = Article.query.filter_by(
                 article_id=article_id).first()
             res_article.countbrowse += 1
@@ -289,7 +304,8 @@ def index():
                 db.session.delete(res_history)
                 db.session.commit()
 
-            add_history = History(user_id=user_id, article_id=article_id)
+            add_history = History(user_id=user_id, article_id=article_id,
+                                  appid=appid, order=order)
             db.session.add(add_history)
             db.session.commit()
             return "ok"
@@ -299,8 +315,12 @@ def index():
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
             article_id = data_dic["article_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
             res_up = Up.query.filter_by(user_id=user_id,
-                                        article_id=article_id).first()
+                                        article_id=article_id,
+                                        appid=appid,
+                                        order=order).first()
             res_article = Article.query.filter_by(
                 article_id=article_id).first()
             try:
@@ -312,7 +332,8 @@ def index():
             if res_up:
                 return "已赞过"
             else:
-                add_up = Up(user_id=user_id, article_id=article_id)
+                add_up = Up(user_id=user_id, article_id=article_id,
+                            appid=appid, order=order)
                 db.session.add(add_up)
                 db.session.commit()
             return "ok"
@@ -322,8 +343,12 @@ def index():
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
             article_id = data_dic["article_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
             get_collect = Collect.query.filter_by(user_id=user_id,
-                                                  article_id=article_id).first()
+                                                  article_id=article_id,
+                                                  appid=appid,
+                                                  order=order).first()
             if get_collect:
                 db.session.delete(get_collect)
                 db.session.commit()
@@ -336,8 +361,12 @@ def index():
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
             article_id = data_dic["article_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
             get_history = History.query.filter_by(user_id=user_id,
-                                                  article_id=article_id).first()
+                                                  article_id=article_id,
+                                                  appid=appid,
+                                                  order=order).first()
             if get_history:
                 db.session.delete(get_history)
                 db.session.commit()
@@ -350,8 +379,12 @@ def index():
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
             article_id = data_dic["article_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
             get_up = Up.query.filter_by(user_id=user_id,
-                                        article_id=article_id).first()
+                                        article_id=article_id,
+                                        appid=appid,
+                                        order=order).first()
             if get_up:
                 db.session.delete(get_up)
                 db.session.commit()
@@ -363,7 +396,11 @@ def index():
         if cleanhistory:
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
-            res_history = History.query.filter_by(user_id=user_id).all()
+            appid = data_dic["appid"]
+            order = data_dic["order"]
+            res_history = History.query.filter_by(user_id=user_id,
+                                                  appid=appid,
+                                                  order=order).all()
             [db.session.delete(i) for i in res_history]
             db.session.commit()
             return "ok"
@@ -372,7 +409,11 @@ def index():
         if cleancollect:
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
-            res_collect = Collect.query.filter_by(user_id=user_id).all()
+            appid = data_dic["appid"]
+            order = data_dic["order"]
+            res_collect = Collect.query.filter_by(user_id=user_id,
+                                                  appid=appid,
+                                                  order=order).all()
             [db.session.delete(i) for i in res_collect]
             db.session.commit()
             return "ok"
@@ -381,7 +422,11 @@ def index():
         if cleanup:
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
-            res_up = Up.query.filter_by(user_id=user_id).all()
+            appid = data_dic["appid"]
+            order = data_dic["order"]
+            res_up = Up.query.filter_by(user_id=user_id,
+                                        appid=appid,
+                                        order=order).all()
             [db.session.delete(i) for i in res_up]
             db.session.commit()
             return "ok"
@@ -390,8 +435,12 @@ def index():
         if showhistory:
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
             page = data_dic["page"]
-            show_history = History.query.filter_by(user_id=user_id).\
+            show_history = History.query.filter_by(user_id=user_id,
+                                                   appid=appid,
+                                                   order=order).\
                 order_by(History.id.desc()).all()
             if show_history:
                 index1 = page * 8
@@ -406,8 +455,12 @@ def index():
         if showcollect:
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
             page = data_dic["page"]
-            show_collect = Collect.query.filter_by(user_id=user_id).\
+            show_collect = Collect.query.filter_by(user_id=user_id,
+                                                   appid=appid,
+                                                   order=order).\
                 order_by(Collect.id.desc()).all()
             if show_collect:
                 index1 = page * 8
@@ -422,8 +475,12 @@ def index():
         if showup:
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
+            appid = data_dic["appid"]
+            order = data_dic["order"]
             page = data_dic["page"]
-            show_up = Up.query.filter_by(user_id=user_id).\
+            show_up = Up.query.filter_by(user_id=user_id,
+                                         appid=appid,
+                                         order=order).\
                 order_by(Up.id.desc()).all()
             if show_up:
                 index1 = page * 8
