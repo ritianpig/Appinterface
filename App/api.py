@@ -531,9 +531,14 @@ def index():
         if recordcouunt:
             data_dic = json.loads(get_data)
             user_id = data_dic["user_id"]
-            res_historys = History.query.filter_by(user_id=user_id).all()
-            res_collects = Collect.query.filter_by(user_id=user_id).all()
-            res_ups = Up.query.filter_by(user_id=user_id).all()
+            appid = data_dic["appid"]
+            order = data_dic["order"]
+            res_historys = History.query.filter_by(user_id=user_id, appid=appid,
+                                                   order=order).all()
+            res_collects = Collect.query.filter_by(user_id=user_id, appid=appid,
+                                                   order=order).all()
+            res_ups = Up.query.filter_by(user_id=user_id, appid=appid,
+                                         order=order).all()
             result = {
                 "HiCount": len(res_historys),
                 "CoCount": len(res_collects),
